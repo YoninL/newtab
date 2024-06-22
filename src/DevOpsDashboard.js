@@ -31,7 +31,7 @@ const ToolCard = ({ tool, onEdit, onDelete }) => (
   </Card>
 );
 
-const ToolForm = ({ tool, onSave, onCancel }) => {
+const ToolForm = ({ tool, onSave, onCancel, groups }) => {
   const [formData, setFormData] = useState(tool || { title: '', description: '', url: '', groupId: '' });
 
   const handleChange = (e) => {
@@ -48,7 +48,18 @@ const ToolForm = ({ tool, onSave, onCancel }) => {
       <Input name="title" value={formData.title} onChange={handleChange} placeholder="Tool Title" required />
       <Input name="description" value={formData.description} onChange={handleChange} placeholder="Description" />
       <Input name="url" value={formData.url} onChange={handleChange} placeholder="URL" required />
-      <Input name="groupId" value={formData.groupId} onChange={handleChange} placeholder="Group ID" required />
+      <select 
+        name="groupId" 
+        value={formData.groupId} 
+        onChange={handleChange} 
+        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm" 
+        required
+      >
+        <option value="">Select a Group</option>
+        {groups.map(group => (
+          <option key={group.id} value={group.id}>{group.name}</option>
+        ))}
+      </select>
       <div className="flex justify-end space-x-2">
         <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
         <Button type="submit">Save</Button>
@@ -119,6 +130,7 @@ const DevOpsDashboard = () => {
           <CardContent className="pt-6">
             <ToolForm
               tool={editingTool}
+              groups={groups}
               onSave={handleSaveTool}
               onCancel={() => {
                 setEditingTool(null);
