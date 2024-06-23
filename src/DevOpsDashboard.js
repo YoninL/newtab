@@ -14,6 +14,12 @@ const ToolCard = ({ tool, onEdit, onDelete }) => {
     }
   };
 
+  const handleDelete = () => {
+    if (window.confirm("Are you sure you want to delete this tool?")) {
+      onDelete(tool.id);
+    }
+  };
+
   return (
     <Card className="hover:shadow-lg transition-shadow p-1">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0.5">
@@ -39,7 +45,7 @@ const ToolCard = ({ tool, onEdit, onDelete }) => {
               Edit
             </span>
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => onDelete(tool.id)} className="relative group">
+          <Button variant="ghost" size="icon" onClick={handleDelete} className="relative group">
             <X className="h-2 w-2" />
             <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
               Delete
