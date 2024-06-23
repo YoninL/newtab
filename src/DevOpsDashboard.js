@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui";
 import { Button } from "./components/ui";
 import { Input } from "./components/ui";
-import { Grid, Plus, X, Edit, Save } from "lucide-react";
+import { Grid, Plus, X, Edit, Save, ChevronDown, ChevronUp } from "lucide-react";
 
 const ToolCard = ({ tool, onEdit, onDelete }) => (
   <Card className="hover:shadow-lg transition-shadow">
@@ -73,6 +73,7 @@ const DevOpsDashboard = () => {
   const [groups, setGroups] = useState([]);
   const [editingTool, setEditingTool] = useState(null);
   const [isAddingTool, setIsAddingTool] = useState(false);
+  const [collapsedGroups, setCollapsedGroups] = useState({});
 
   useEffect(() => {
     const savedTools = JSON.parse(localStorage.getItem('devopsTools')) || [];
@@ -114,6 +115,13 @@ const DevOpsDashboard = () => {
     }
   };
 
+  const toggleGroupCollapse = (groupId) => {
+    setCollapsedGroups(prevState => ({
+      ...prevState,
+      [groupId]: !prevState[groupId]
+    }));
+  };
+
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <h1 className="text-3xl font-bold mb-6 flex items-center">
@@ -142,19 +150,26 @@ const DevOpsDashboard = () => {
       )}
       {groups.map(group => (
         <div key={group.id} className="mb-6">
-          <h2 className="text-xl font-semibold mb-4">{group.name}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {tools
-              .filter(tool => tool.groupId === group.id)
-              .map(tool => (
-                <ToolCard
-                  key={tool.id}
-                  tool={tool}
-                  onEdit={setEditingTool}
-                  onDelete={handleDeleteTool}
-                />
-              ))}
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">{group.name}</h2>
+            <Button variant="ghost" size="icon" onClick={() => toggleGroupCollapse(group.id)}>
+              {collapsedGroups[group.id] ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+            </Button>
           </div>
+          {!collapsedGroups[group.id] && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {tools
+                .filter(tool => tool.groupId === group.id)
+                .map(tool => (
+                  <ToolCard
+                    key={tool.id}
+                    tool={tool}
+                    onEdit={setEditingTool}
+                    onDelete={handleDeleteTool}
+                  />
+                ))}
+            </div>
+          )}
         </div>
       ))}
     </div>
