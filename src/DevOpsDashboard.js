@@ -4,34 +4,46 @@ import { Button } from "./components/ui";
 import { Input } from "./components/ui";
 import { Grid, Plus, X, Edit, Save, ChevronDown, ChevronUp } from "lucide-react";
 
-const ToolCard = ({ tool, onEdit, onDelete }) => (
-  <Card className="h-full hover:shadow-md transition-shadow">
-    <CardHeader className="p-4">
-      <CardTitle className="text-sm font-medium flex justify-between items-center">
-        {tool.title}
+const ToolCard = ({ tool, onEdit, onDelete }) => {
+  const getFaviconUrl = (url) => {
+    try {
+      const { hostname } = new URL(url);
+      return `https://www.google.com/s2/favicons?domain=${hostname}`;
+    } catch (error) {
+      return '';
+    }
+  };
+
+  return (
+    <Card className="hover:shadow-lg transition-shadow p-1">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0.5">
+        <div className="flex items-center">
+          <img src={getFaviconUrl(tool.url)} alt="favicon" className="h-4 w-4 mr-2" />
+          <CardTitle className="text-xxs font-medium">{tool.title}</CardTitle>
+        </div>
         <div>
           <Button variant="ghost" size="icon" onClick={() => onEdit(tool)}>
-            <Edit className="h-4 w-4" />
+            <Edit className="h-2 w-2" />
           </Button>
           <Button variant="ghost" size="icon" onClick={() => onDelete(tool.id)}>
-            <X className="h-4 w-4" />
+            <X className="h-2 w-2" />
           </Button>
         </div>
-      </CardTitle>
-    </CardHeader>
-    <CardContent className="p-4 pt-0">
-      <p className="text-xs text-muted-foreground mb-2">{tool.description}</p>
-      <a
-        href={tool.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-xs text-blue-500 hover:text-blue-700 transition-colors"
-      >
-        Open Tool
-      </a>
-    </CardContent>
-  </Card>
-);
+      </CardHeader>
+      <CardContent className="p-1">
+        <p className="text-xxs text-muted-foreground">{tool.description}</p>
+        <a
+          href={tool.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xxs text-blue-500 hover:text-blue-700 transition-colors mt-0.5 inline-block"
+        >
+          Open Tool
+        </a>
+      </CardContent>
+    </Card>
+  );
+};
 
 const ToolForm = ({ tool, onSave, onCancel, groups }) => {
   const [formData, setFormData] = useState(tool || { title: '', description: '', url: '', groupId: '' });
@@ -67,6 +79,37 @@ const ToolForm = ({ tool, onSave, onCancel, groups }) => {
         <Button type="submit">Save</Button>
       </div>
     </form>
+  );
+};
+
+const GroupSection = ({ group, tools, onEdit, onDelete }) => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  return (
+    <div className="mb-6">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center">
+          <h2 className="text-xl font-semibold mr-2">{group.name}</h2>
+          <Button variant="ghost" size="icon" onClick={() => setIsCollapsed(!isCollapsed)}>
+            {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+          </Button>
+        </div>
+      </div>
+      {!isCollapsed && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {tools
+            .filter(tool => tool.groupId === group.id)
+            .map(tool => (
+              <ToolCard
+                key={tool.id}
+                tool={tool}
+                onEdit={onEdit}
+                onDelete={onDelete}
+              />
+            ))}
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -124,74 +167,41 @@ const DevOpsDashboard = () => {
     }));
   };
 
-  const GroupSection = ({ group, tools, onEdit, onDelete }) => {
-    const [isCollapsed, setIsCollapsed] = useState(false);
-  
-    return (
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-xl font-semibold">{group.name}</h2>
-          <Button variant="ghost" size="sm" onClick={() => setIsCollapsed(!isCollapsed)}>
-            {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
-          </Button>
-        </div>
-        {!isCollapsed && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {tools
-              .filter(tool => tool.groupId === group.id)
-              .map(tool => (
-                <ToolCard
-                  key={tool.id}
-                  tool={tool}
-                  onEdit={onEdit}
-                  onDelete={onDelete}
-                />
-              ))}
-          </div>
-        )}
-      </div>
-    );
-  };
-
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6 flex items-center">
-          <Grid className="mr-2" /> DevOps Dashboard
-        </h1>
-        <div className="flex space-x-4 mb-6">
-          <Button onClick={() => setIsAddingTool(true)}>
-            <Plus className="mr-2 h-4 w-4" /> Add Tool
-          </Button>
-          <Button onClick={handleAddGroup}>
-            <Plus className="mr-2 h-4 w-4" /> Add Group
-          </Button>
-        </div>
-        {(isAddingTool || editingTool) && (
-          <Card className="mb-6">
-            <CardContent className="pt-6">
-              <ToolForm
-                tool={editingTool}
-                groups={groups}
-                onSave={handleSaveTool}
-                onCancel={() => {
-                  setEditingTool(null);
-                  setIsAddingTool(false);
-                }}
-              />
-            </CardContent>
-          </Card>
-        )}
-        {groups.map(group => (
-          <GroupSection
-            key={group.id}
-            group={group}
-            tools={tools}
-            onEdit={setEditingTool}
-            onDelete={handleDeleteTool}
-          />
-        ))}
-      </div>
+      <h1 className="text-3xl font-bold mb-6 flex items-center">
+        <Grid className="mr-2" /> DevOps Dashboard
+      </h1>
+      <Button onClick={() => setIsAddingTool(true)} className="mb-4">
+        <Plus className="mr-2 h-4 w-4" /> Add Tool
+      </Button>
+      <Button onClick={handleAddGroup} className="mb-4 ml-2">
+        <Plus className="mr-2 h-4 w-4" /> Add Group
+      </Button>
+      {(isAddingTool || editingTool) && (
+        <Card className="mb-4">
+          <CardContent className="pt-6">
+            <ToolForm
+              tool={editingTool}
+              groups={groups}
+              onSave={handleSaveTool}
+              onCancel={() => {
+                setEditingTool(null);
+                setIsAddingTool(false);
+              }}
+            />
+          </CardContent>
+        </Card>
+      )}
+      {groups.map(group => (
+        <GroupSection
+          key={group.id}
+          group={group}
+          tools={tools}
+          onEdit={setEditingTool}
+          onDelete={handleDeleteTool}
+        />
+      ))}
     </div>
   );
 };
