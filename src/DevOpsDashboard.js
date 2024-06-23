@@ -4,7 +4,7 @@ import { Button } from "./components/ui";
 import { Input } from "./components/ui";
 import { Grid, Plus, X, Edit, Save, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 
-const ToolCard = ({ tool, onEdit, onDelete }) => {
+const ToolCard = ({ tool, onEdit, onDelete, isHovered }) => {
   const getFaviconUrl = (url) => {
     try {
       const { hostname } = new URL(url);
@@ -21,37 +21,39 @@ const ToolCard = ({ tool, onEdit, onDelete }) => {
   };
 
   return (
-    <Card className="hover:shadow-lg transition-shadow p-1">
+    <Card className="hover:shadow-lg transition-shadow p-1 group">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0.5">
         <div className="flex items-center">
           <img src={getFaviconUrl(tool.url)} alt="favicon" className="h-4 w-4 mr-2" />
           <CardTitle className="text-xxs font-medium">{tool.title}</CardTitle>
         </div>
-        <div className="flex items-center space-x-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => window.open(tool.url, '_blank')}
-            className="relative group"
-          >
-            <ExternalLink className="h-2 w-2" />
-            <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-              Open Tool
-            </span>
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => onEdit(tool)} className="relative group">
-            <Edit className="h-2 w-2" />
-            <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-              Edit
-            </span>
-          </Button>
-          <Button variant="ghost" size="icon" onClick={handleDelete} className="relative group">
-            <X className="h-2 w-2" />
-            <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-              Delete
-            </span>
-          </Button>
-        </div>
+        {isHovered && (
+          <div className="flex items-center space-x-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => window.open(tool.url, '_blank')}
+              className="relative group"
+            >
+              <ExternalLink className="h-3 w-3" />
+              <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                Open
+              </span>
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => onEdit(tool)} className="relative group">
+              <Edit className="h-3 w-3" />
+              <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                Edit
+              </span>
+            </Button>
+            <Button variant="ghost" size="icon" onClick={handleDelete} className="relative group">
+              <X className="h-3 w-3" />
+              <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                Delete
+              </span>
+            </Button>
+          </div>
+        )}
       </CardHeader>
       <CardContent className="p-1">
         <p className="text-xxs text-muted-foreground">{tool.description}</p>
@@ -59,6 +61,7 @@ const ToolCard = ({ tool, onEdit, onDelete }) => {
     </Card>
   );
 };
+
 
 const ToolForm = ({ tool, onSave, onCancel, groups }) => {
   const [formData, setFormData] = useState(tool || { title: '', description: '', url: '', groupId: '' });
@@ -99,6 +102,8 @@ const ToolForm = ({ tool, onSave, onCancel, groups }) => {
 
 const GroupSection = ({ group, tools, onEdit, onDelete, onEditGroup, onDeleteGroup }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [hoveredToolId, setHoveredToolId] = useState(null);
+  const [isGroupHovered, setIsGroupHovered] = useState(false);
 
   const handleDeleteGroup = () => {
     if (window.confirm("Are you sure you want to delete this group?")) {
@@ -107,28 +112,36 @@ const GroupSection = ({ group, tools, onEdit, onDelete, onEditGroup, onDeleteGro
   };
 
   return (
-    <div className="mb-6">
+    <div
+      className="mb-6 group"
+      onMouseEnter={() => setIsGroupHovered(true)}
+      onMouseLeave={() => setIsGroupHovered(false)}
+    >
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center">
           <h2 className="text-xl font-semibold mr-2">{group.name}</h2>
-          <Button variant="ghost" size="icon" onClick={() => setIsCollapsed(!isCollapsed)} className="relative group">
-            {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
-            <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-              {isCollapsed ? 'Expand' : 'Collapse'}
-            </span>
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => onEditGroup(group)} className="relative group">
-            <Edit className="h-3 w-3" />
-            <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-              Edit
-            </span>
-          </Button>
-          <Button variant="ghost" size="icon" onClick={handleDeleteGroup} className="relative group">
-            <X className="h-3 w-3" />
-            <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-              Delete
-            </span>
-          </Button>
+          {isGroupHovered && (
+            <div className="flex items-center space-x-1">
+              <Button variant="ghost" size="icon" onClick={() => setIsCollapsed(!isCollapsed)} className="relative group">
+                {isCollapsed ? <ChevronDown className="h-3 w-3" /> : <ChevronUp className="h-3 w-3" />}
+                <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                  {isCollapsed ? 'Expand' : 'Collapse'}
+                </span>
+              </Button>
+              <Button variant="ghost" size="icon" onClick={() => onEditGroup(group)} className="relative group">
+                <Edit className="h-3 w-3" />
+                <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                  Edit
+                </span>
+              </Button>
+              <Button variant="ghost" size="icon" onClick={handleDeleteGroup} className="relative group">
+                <X className="h-3 w-3" />
+                <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                  Delete
+                </span>
+              </Button>
+            </div>
+          )}
         </div>
       </div>
       {!isCollapsed && (
@@ -136,18 +149,25 @@ const GroupSection = ({ group, tools, onEdit, onDelete, onEditGroup, onDeleteGro
           {tools
             .filter(tool => tool.groupId === group.id)
             .map(tool => (
-              <ToolCard
+              <div
                 key={tool.id}
-                tool={tool}
-                onEdit={onEdit}
-                onDelete={onDelete}
-              />
+                onMouseEnter={() => setHoveredToolId(tool.id)}
+                onMouseLeave={() => setHoveredToolId(null)}
+              >
+                <ToolCard
+                  tool={tool}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  isHovered={hoveredToolId === tool.id}
+                />
+              </div>
             ))}
         </div>
       )}
     </div>
   );
 };
+
 
 const DevOpsDashboard = () => {
   const [tools, setTools] = useState([]);
