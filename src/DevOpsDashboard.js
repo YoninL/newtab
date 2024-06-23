@@ -36,21 +36,12 @@ const ToolCard = ({ tool, onEdit, onDelete, isHovered }) => {
               className="relative group"
             >
               <ExternalLink className="h-3 w-3" />
-              <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                Open
-              </span>
             </Button>
             <Button variant="ghost" size="icon" onClick={() => onEdit(tool)} className="relative group">
               <Edit className="h-3 w-3" />
-              <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                Edit
-              </span>
             </Button>
             <Button variant="ghost" size="icon" onClick={handleDelete} className="relative group">
               <X className="h-3 w-3" />
-              <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                Delete
-              </span>
             </Button>
           </div>
         )}
@@ -61,6 +52,7 @@ const ToolCard = ({ tool, onEdit, onDelete, isHovered }) => {
     </Card>
   );
 };
+
 
 
 const ToolForm = ({ tool, onSave, onCancel, groups }) => {
@@ -124,21 +116,12 @@ const GroupSection = ({ group, tools, onEdit, onDelete, onEditGroup, onDeleteGro
             <div className="flex items-center space-x-1">
               <Button variant="ghost" size="icon" onClick={() => setIsCollapsed(!isCollapsed)} className="relative group">
                 {isCollapsed ? <ChevronDown className="h-3 w-3" /> : <ChevronUp className="h-3 w-3" />}
-                <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                  {isCollapsed ? 'Expand' : 'Collapse'}
-                </span>
               </Button>
               <Button variant="ghost" size="icon" onClick={() => onEditGroup(group)} className="relative group">
                 <Edit className="h-3 w-3" />
-                <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                  Edit
-                </span>
               </Button>
               <Button variant="ghost" size="icon" onClick={handleDeleteGroup} className="relative group">
                 <X className="h-3 w-3" />
-                <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                  Delete
-                </span>
               </Button>
             </div>
           )}
@@ -241,7 +224,7 @@ const DevOpsDashboard = () => {
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <h1 className="text-3xl font-bold mb-6 flex items-center">
-        <Grid className="mr-2" /> DevOps Dashboard
+        <Grid className="mr-2" /> DevOps Tools Dashboard
       </h1>
       <Button onClick={() => setIsAddingTool(true)} className="mb-4">
         <Plus className="mr-2 h-4 w-4" /> Add Tool
