@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui";
 import { Button } from "./components/ui";
 import { Input } from "./components/ui";
-import { Grid, Plus, X, Edit, Save, ChevronDown, ChevronUp } from "lucide-react";
+import { Grid, Plus, X, Edit, Save, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 
 const ToolCard = ({ tool, onEdit, onDelete }) => {
   const getFaviconUrl = (url) => {
@@ -21,25 +21,34 @@ const ToolCard = ({ tool, onEdit, onDelete }) => {
           <img src={getFaviconUrl(tool.url)} alt="favicon" className="h-4 w-4 mr-2" />
           <CardTitle className="text-xxs font-medium">{tool.title}</CardTitle>
         </div>
-        <div>
-          <Button variant="ghost" size="icon" onClick={() => onEdit(tool)}>
-            <Edit className="h-2 w-2" />
+        <div className="flex items-center space-x-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => window.open(tool.url, '_blank')}
+            className="relative group"
+          >
+            <ExternalLink className="h-2 w-2" />
+            <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+              Open Tool
+            </span>
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => onDelete(tool.id)}>
+          <Button variant="ghost" size="icon" onClick={() => onEdit(tool)} className="relative group">
+            <Edit className="h-2 w-2" />
+            <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+              Edit
+            </span>
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => onDelete(tool.id)} className="relative group">
             <X className="h-2 w-2" />
+            <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+              Delete
+            </span>
           </Button>
         </div>
       </CardHeader>
       <CardContent className="p-1">
         <p className="text-xxs text-muted-foreground">{tool.description}</p>
-        <a
-          href={tool.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xxs text-blue-500 hover:text-blue-700 transition-colors mt-0.5 inline-block"
-        >
-          Open Tool
-        </a>
       </CardContent>
     </Card>
   );
