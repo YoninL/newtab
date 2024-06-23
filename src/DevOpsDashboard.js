@@ -97,16 +97,37 @@ const ToolForm = ({ tool, onSave, onCancel, groups }) => {
   );
 };
 
-const GroupSection = ({ group, tools, onEdit, onDelete }) => {
+const GroupSection = ({ group, tools, onEdit, onDelete, onEditGroup, onDeleteGroup }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const handleDeleteGroup = () => {
+    if (window.confirm("Are you sure you want to delete this group?")) {
+      onDeleteGroup(group.id);
+    }
+  };
 
   return (
     <div className="mb-6">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center">
           <h2 className="text-xl font-semibold mr-2">{group.name}</h2>
-          <Button variant="ghost" size="icon" onClick={() => setIsCollapsed(!isCollapsed)}>
+          <Button variant="ghost" size="icon" onClick={() => setIsCollapsed(!isCollapsed)} className="relative group">
             {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+            <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+              {isCollapsed ? 'Expand' : 'Collapse'}
+            </span>
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => onEditGroup(group)} className="relative group">
+            <Edit className="h-3 w-3" />
+            <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+              Edit
+            </span>
+          </Button>
+          <Button variant="ghost" size="icon" onClick={handleDeleteGroup} className="relative group">
+            <X className="h-3 w-3" />
+            <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 text-xxs bg-gray-800 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+              Delete
+            </span>
           </Button>
         </div>
       </div>
@@ -175,6 +196,21 @@ const DevOpsDashboard = () => {
     }
   };
 
+  const handleEditGroup = (group) => {
+    const newGroupName = prompt("Edit group name:", group.name);
+    if (newGroupName) {
+      const newGroups = groups.map(g => g.id === group.id ? { ...g, name: newGroupName } : g);
+      setGroups(newGroups);
+      saveToLocalStorage(tools, newGroups);
+    }
+  };
+
+  const handleDeleteGroup = (id) => {
+    const newGroups = groups.filter(g => g.id !== id);
+    setGroups(newGroups);
+    saveToLocalStorage(tools, newGroups);
+  };
+
   const toggleGroupCollapse = (groupId) => {
     setCollapsedGroups(prevState => ({
       ...prevState,
@@ -215,6 +251,8 @@ const DevOpsDashboard = () => {
           tools={tools}
           onEdit={setEditingTool}
           onDelete={handleDeleteTool}
+          onEditGroup={handleEditGroup}
+          onDeleteGroup={handleDeleteGroup}
         />
       ))}
     </div>
